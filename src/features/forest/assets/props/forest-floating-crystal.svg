@@ -1,0 +1,19 @@
+<svg width="140" height="180" viewBox="0 0 140 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="crystal" x1="70" y1="10" x2="70" y2="170" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFF0FF"/>
+      <stop offset="0.45" stop-color="#F6A8F0"/>
+      <stop offset="1" stop-color="#8A7BFF"/>
+    </linearGradient>
+  </defs>
+  <path
+    d="M70 8L122 44L106 158L48 172L16 70L70 8Z"
+    fill="url(#crystal)"
+    fill-opacity="0.92"
+    stroke="#F9E8FF"
+    stroke-width="6"
+  />
+  <path d="M70 8L48 172" stroke="#FFFFFF" stroke-opacity="0.55" stroke-width="3"/>
+  <path d="M70 8L106 158" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="3"/>
+  <path d="M16 70L122 44" stroke="#FFFFFF" stroke-opacity="0.25" stroke-width="3"/>
+</svg>

@@ -1,0 +1,22 @@
+<svg width="260" height="760" viewBox="0 0 260 760" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="ribbon" x1="130" y1="0" x2="130" y2="760" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFE5F7" stop-opacity="0.92"/>
+      <stop offset="0.5" stop-color="#FFC4EB" stop-opacity="0.56"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <path
+    d="M130 0C182 62 206 124 182 190C160 248 86 284 84 350C82 426 190 470 182 540C176 598 126 642 146 760"
+    stroke="url(#ribbon)"
+    stroke-width="26"
+    stroke-linecap="round"
+  />
+  <path
+    d="M130 0C182 62 206 124 182 190C160 248 86 284 84 350C82 426 190 470 182 540C176 598 126 642 146 760"
+    stroke="#FFF6FE"
+    stroke-opacity="0.75"
+    stroke-width="8"
+    stroke-linecap="round"
+  />
+</svg>
