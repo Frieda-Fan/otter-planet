@@ -2,46 +2,32 @@ import type { RouteCard } from '../../../../types';
 
 export const landingHighlights = [
   {
-    title: '童话级沉浸开场',
-    description: '倒悬森林、月光丝带与柔和发光晶体，建立奇幻但安全的第一感受。',
+    title: '像童话一样的夜晚森林',
+    description: '会发光的道路、倒悬的树冠和温柔的月瀑，会带孩子慢慢走进故事里。',
   },
   {
-    title: '语音 + 手势双交互',
-    description: '围绕魔法棒体验设计，让孩子尽量不用键盘和复杂点击也能继续冒险。',
+    title: '孩子一看就会玩的互动',
+    description: '先用点击、输入和选择来完成旅程，后面再慢慢接入语音和手势。',
   },
   {
-    title: '剧情闭环可分享',
-    description: '从找月亮到故事视频生成，最终沉淀为作品库与家长可传播内容。',
+    title: '每次冒险都能留下回忆',
+    description: '从出发、寻找月亮到故事回顾，孩子和家长都能看到这趟旅程的收获。',
   },
 ];
 
 export const routeCards: RouteCard[] = [
   {
-    eyebrow: 'Launch',
-    title: '启动落地页',
-    description: '产品世界观、主视觉和核心体验价值展示。',
-    to: '/',
-    cta: '查看开场',
-  },
-  {
-    eyebrow: 'Access',
-    title: '登录与权限引导',
-    description: '面向家长的低门槛入口，兼顾合规说明与权限授权。',
+    eyebrow: '今晚可以做什么',
+    title: '和小水獭一起开始旅程',
+    description: '先认识你的新伙伴，再带着它走进会发光的倒悬森林。',
     to: '/login',
-    cta: '进入登录',
+    cta: '现在出发',
   },
   {
-    eyebrow: 'Bond',
-    title: '伙伴领养页',
-    description: '建立情感连接，准备进入训练与冒险链路。',
-    to: '/adopt',
-    cta: '领养水獭',
-  },
-  {
-    eyebrow: 'Scene',
-    title: '森林冒险容器',
-    description: '后续剧情、交互 HUD、场景探索与 NPC 调度都会从这里扩展。',
+    eyebrow: '继续冒险',
+    title: '回到上次的月亮任务',
+    description: '如果已经领养好小水獭，就能直接继续上次的森林旅程。',
     to: '/adventure',
-    cta: '查看冒险',
+    cta: '继续寻找月亮',
   },
 ];

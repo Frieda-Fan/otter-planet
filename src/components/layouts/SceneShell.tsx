@@ -8,10 +8,10 @@ type SceneShellProps = {
 };
 
 const navItems = [
-  { to: '/', label: '启动页' },
-  { to: '/login', label: '登录' },
-  { to: '/adopt', label: '领养' },
-  { to: '/adventure', label: '冒险' },
+  { to: '/', label: '首页' },
+  { to: '/login', label: '进入旅程' },
+  { to: '/adopt', label: '领养伙伴' },
+  { to: '/adventure', label: '森林冒险' },
 ];
 
 export function SceneShell({

@@ -1,0 +1,18 @@
+<svg width="320" height="320" viewBox="0 0 320 320" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="320" height="320" rx="48" fill="url(#bg)"/>
+  <circle cx="160" cy="126" r="86" fill="#F5A94C"/>
+  <circle cx="160" cy="132" r="56" fill="#FFF1D9"/>
+  <circle cx="138" cy="120" r="10" fill="#4B2F20"/>
+  <circle cx="182" cy="120" r="10" fill="#4B2F20"/>
+  <path d="M145 152C155 160 169 160 179 152" stroke="#4B2F20" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="104" cy="88" r="22" fill="#F7C670"/>
+  <circle cx="216" cy="88" r="22" fill="#F7C670"/>
+  <path d="M108 220C123 196 141 184 160 184C179 184 197 196 212 220V248H108V220Z" fill="#E58A30"/>
+  <text x="160" y="285" text-anchor="middle" fill="#FFF9E2" font-size="24" font-family="Microsoft YaHei UI, sans-serif">狮子先生</text>
+  <defs>
+    <linearGradient id="bg" x1="38" y1="28" x2="284" y2="292" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#8F4AE8"/>
+      <stop offset="1" stop-color="#321B59"/>
+    </linearGradient>
+  </defs>
+</svg>

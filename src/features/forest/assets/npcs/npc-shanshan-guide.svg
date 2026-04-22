@@ -1,0 +1,19 @@
+<svg width="320" height="320" viewBox="0 0 320 320" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="320" height="320" rx="48" fill="url(#bg)"/>
+  <circle cx="160" cy="120" r="62" fill="#FFF5C5"/>
+  <path d="M110 232C110 193.34 141.34 162 180 162H196C234.66 162 266 193.34 266 232V250H110V232Z" fill="#FFD96D"/>
+  <circle cx="138" cy="110" r="10" fill="#3D2A47"/>
+  <circle cx="188" cy="110" r="10" fill="#3D2A47"/>
+  <path d="M145 138C156.333 149.333 171.667 149.333 183 138" stroke="#3D2A47" stroke-width="8" stroke-linecap="round"/>
+  <path d="M98 84L120 44L136 86" fill="#FFE992"/>
+  <path d="M206 86L222 44L244 84" fill="#FFE992"/>
+  <circle cx="84" cy="86" r="12" fill="#FFF2AB"/>
+  <circle cx="240" cy="92" r="10" fill="#FFF2AB"/>
+  <text x="160" y="285" text-anchor="middle" fill="#FFF9E2" font-size="24" font-family="Microsoft YaHei UI, sans-serif">闪闪</text>
+  <defs>
+    <linearGradient id="bg" x1="42" y1="32" x2="286" y2="290" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#6B4ED9"/>
+      <stop offset="1" stop-color="#1D2B61"/>
+    </linearGradient>
+  </defs>
+</svg>

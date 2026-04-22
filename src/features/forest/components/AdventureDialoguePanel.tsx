@@ -23,12 +23,15 @@ export function AdventureDialoguePanel({
 
   return (
     <div className="dialogue-panel">
-      <div className="dialogue-panel__header">
-        <p className="metric-card__label">Dialogue Panel</p>
-        <h3>{npc.name} 已出场</h3>
-        <span>
-          {npc.role} · 当前情绪：{npc.mood}
-        </span>
+      <div className="dialogue-panel__header dialogue-panel__header--with-portrait">
+        <img className="dialogue-panel__portrait" src={npc.imageSrc} alt={`${npc.name}的角色形象`} />
+        <div>
+          <p className="metric-card__label">正在遇见</p>
+          <h3>{npc.name}</h3>
+          <span>
+            {npc.role} 路 现在心情：{npc.mood}
+          </span>
+        </div>
       </div>
 
       <div className="dialogue-list">

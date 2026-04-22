@@ -1,49 +1,91 @@
+import { FormEvent, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { SceneShell } from '../../../components/layouts/SceneShell';
-import { GlowButton } from '../../../components/ui/GlowButton';
 import { Panel } from '../../../components/ui/Panel';
+import { useProductSession } from '../../../state';
 import { permissionChecklist } from './data/loginContent';
 
 export function LoginPage() {
+  const navigate = useNavigate();
+  const { session, patchSession } = useProductSession();
+  const [guardianName, setGuardianName] = useState(session.guardianName);
+  const [childName, setChildName] = useState(session.childName);
+  const [agreed, setAgreed] = useState(session.hasEntered);
+
+  const canContinue =
+    guardianName.trim().length > 0 && childName.trim().length > 0 && agreed;
+
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (!canContinue) {
+      return;
+    }
+
+    patchSession({
+      guardianName: guardianName.trim(),
+      childName: childName.trim(),
+      hasEntered: true,
+    });
+    navigate('/adopt');
+  };
+
   return (
     <SceneShell
-      sceneLabel="Access Portal"
-      title="登录与权限引导"
-      subtitle="这一页不是简单表单，而是面向家长的陪伴式入口。后续会在这里接手机号登录、微信授权与设备权限状态。"
+      sceneLabel="Family Entry"
+      title="和家长一起进入旅程"
+      subtitle="先留下今晚要一起冒险的名字。准备好以后，我们就去认识那只等着被领养的小水獭。"
     >
       <section className="grid-two">
-        <Panel eyebrow="Guardian Entry" title="极简登录入口">
-          <div className="stack-list">
-            <div className="metric-card">
-              <p className="metric-card__label">登录方式 A</p>
-              <h3>手机号一键登录</h3>
-              <span>适合 PC / 平板浏览器，后续会接大尺寸数字输入与语音播报。</span>
-            </div>
-            <div className="metric-card">
-              <p className="metric-card__label">登录方式 B</p>
-              <h3>微信授权登录</h3>
-              <span>适配微信内置浏览器，为传播与邀请链路做准备。</span>
-            </div>
+        <Panel eyebrow="今晚的陪伴人" title="先告诉小水獭，你们是谁">
+          <form className="product-form" onSubmit={handleSubmit}>
+            <label className="field">
+              <span>家长称呼</span>
+              <input
+                type="text"
+                value={guardianName}
+                onChange={(event) => setGuardianName(event.target.value)}
+                placeholder="比如：妈妈、爸爸、Frieda"
+              />
+            </label>
+            <label className="field">
+              <span>孩子昵称</span>
+              <input
+                type="text"
+                value={childName}
+                onChange={(event) => setChildName(event.target.value)}
+                placeholder="比如：安安、小月、Mimi"
+              />
+            </label>
+            <label className="checkbox-field">
+              <input
+                type="checkbox"
+                checked={agreed}
+                onChange={(event) => setAgreed(event.target.checked)}
+              />
+              <span>我们准备好一起开始今晚的森林冒险了。</span>
+            </label>
             <div className="button-row">
-              <GlowButton to="/adopt" tone="gold">
-                模拟进入领养流程
-              </GlowButton>
+              <button
+                type="submit"
+                className="chapter-button chapter-button--primary"
+                disabled={!canContinue}
+              >
+                去认识小水獭
+              </button>
             </div>
-          </div>
+          </form>
         </Panel>
 
-        <Panel eyebrow="Permissions" title="权限说明卡">
+        <Panel eyebrow="温柔提醒" title="开始前，先看看这三件小事">
           <ul className="check-list">
             {permissionChecklist.map((item) => (
               <li key={item}>{item}</li>
             ))}
           </ul>
-          <div className="permission-demo">
-            <div className="permission-demo__orb permission-demo__orb--camera" />
-            <div className="permission-demo__orb permission-demo__orb--voice" />
-            <div className="permission-demo__card">
-              <strong>童声引导占位</strong>
-              <p>请爸爸妈妈帮忙允许摄像头和麦克风权限，这样我们就能一起玩魔法游戏啦。</p>
-            </div>
+          <div className="welcome-card">
+            <strong>今晚的旅程会先从点击和选择开始。</strong>
+            <p>就算还没有接上语音和手势，小水獭也会像真的一样回应你们。</p>
           </div>
         </Panel>
       </section>

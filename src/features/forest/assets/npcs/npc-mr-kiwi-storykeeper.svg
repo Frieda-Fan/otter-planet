@@ -1,0 +1,19 @@
+<svg width="320" height="320" viewBox="0 0 320 320" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="320" height="320" rx="48" fill="url(#bg)"/>
+  <ellipse cx="162" cy="128" rx="72" ry="82" fill="#9FE36F"/>
+  <ellipse cx="162" cy="138" rx="48" ry="56" fill="#FFF4E5"/>
+  <circle cx="142" cy="122" r="10" fill="#433838"/>
+  <circle cx="182" cy="122" r="10" fill="#433838"/>
+  <path d="M146 154C155.333 161.333 168.667 161.333 178 154" stroke="#433838" stroke-width="8" stroke-linecap="round"/>
+  <path d="M162 52C170 62 174 70 174 84" stroke="#5F7F2C" stroke-width="8" stroke-linecap="round"/>
+  <path d="M154 64C136 68 124 76 116 94" stroke="#5F7F2C" stroke-width="8" stroke-linecap="round"/>
+  <rect x="106" y="188" width="112" height="54" rx="18" fill="#8B5CF6" fill-opacity="0.28"/>
+  <text x="162" y="221" text-anchor="middle" fill="#FFF7E2" font-size="20" font-family="Microsoft YaHei UI, sans-serif">记忆收藏家</text>
+  <text x="160" y="285" text-anchor="middle" fill="#FFF9E2" font-size="24" font-family="Microsoft YaHei UI, sans-serif">猕猴桃先生</text>
+  <defs>
+    <linearGradient id="bg" x1="44" y1="36" x2="286" y2="292" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#365E31"/>
+      <stop offset="1" stop-color="#182E4F"/>
+    </linearGradient>
+  </defs>
+</svg>

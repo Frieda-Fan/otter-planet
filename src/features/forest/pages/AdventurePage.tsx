@@ -1,32 +1,42 @@
 import { otterCharacterImage } from '../../../assets/characters/otter';
 import { GlowButton } from '../../../components/ui/GlowButton';
-import {
-  forestGeneratedSceneAssets,
-} from '../assets';
+import { useProductSession } from '../../../state';
+import { forestGeneratedSceneAssets } from '../assets';
+import { forestChapterRouteScenes } from '../data/adventureRoutes';
 import {
   forestExplorationFirstPersonBackgroundImage,
+  forestInvertedCanopyGateImage,
 } from '../assets/backgrounds';
-import { AdventureStatePanel } from '../components/AdventureStatePanel';
-import { AdventureDialoguePanel } from '../components/AdventureDialoguePanel';
-import { AdventureTimeline } from '../components/AdventureTimeline';
-import {
-  forestAdventureModes,
-  forestExplorationViewpoints,
-  forestLayers,
-  forestNpcProfiles,
-  forestSceneAssetCards,
-} from '../data/adventureContent';
 import { useAdventureDemoStory } from '../hooks/useAdventureDemoStory';
-import { SceneShell } from '../../../components/layouts/SceneShell';
-import { Panel } from '../../../components/ui/Panel';
+
+const chapterBackdropStates = {
+  'moon-missing': {
+    sceneClassName: 'forest-canvas--chapter-1',
+    distanceLabel: '刚刚踏进入口',
+    encounterLabel: '遇见第一位领路朋友',
+  },
+  'glow-trail': {
+    sceneClassName: 'forest-canvas--chapter-2',
+    distanceLabel: '已经走进森林深处',
+    encounterLabel: '在路上遇见温柔倾听者',
+  },
+  'fake-moon': {
+    sceneClassName: 'forest-canvas--chapter-3',
+    distanceLabel: '来到了真假月亮交界处',
+    encounterLabel: '遇见记忆收藏家',
+  },
+  'true-moon': {
+    sceneClassName: 'forest-canvas--chapter-4',
+    distanceLabel: '快走到道路尽头了',
+    encounterLabel: '遇见月亮守门人',
+  },
+} as const;
 
 export function AdventurePage() {
+  const { session } = useProductSession();
   const {
     activeChapter,
     chapters,
-    completedChapterCount,
-    completedFlags,
-    goToChapter,
     completeCurrentChapter,
     dispatchStoryEvent,
     hasStarted,
@@ -35,275 +45,225 @@ export function AdventurePage() {
     startDemo,
     totalReward,
     triggeredEventIds,
-    unlockedChapterCount,
   } = useAdventureDemoStory();
 
+  const companionName = session.otterName || '小波';
+  const personalityText =
+    session.personalityTags.length > 0 ? session.personalityTags.join(' / ') : '勇敢 / 温柔';
+  const playerName = session.childName || '小朋友';
   const activeChapterStatus = activeChapter.isCompleted
-    ? '本章已完成'
+    ? '这一站完成了'
     : activeChapter.canComplete
-      ? '已满足完成条件'
+      ? '可以进入下一站'
       : activeChapter.isUnlocked
-        ? '进行中'
-        : '尚未解锁';
+        ? '正在前进中'
+        : '旅程还没走到这里';
+  const activeChapterIndex = chapters.findIndex((chapter) => chapter.id === activeChapter.id);
+  const progressPercent = `${((activeChapterIndex + 1) / chapters.length) * 100}%`;
+  const chapterVisualState = chapterBackdropStates[activeChapter.id];
+  const completedEvents = activeChapter.events.filter((event) =>
+    triggeredEventIds.has(event.id),
+  ).length;
+  const currentDialogue = activeChapter.dialogue[Math.min(completedEvents, activeChapter.dialogue.length - 1)];
+  const routeStages = forestChapterRouteScenes[activeChapter.id];
+  const currentRouteStage = routeStages[Math.min(completedEvents, routeStages.length - 1)];
 
   return (
-    <SceneShell
-      sceneLabel="Forest Runtime"
-      title="森林冒险主容器"
-      subtitle="这一页先不接训练模块和手势语音引擎，而是优先把“消失的月亮”冒险页搭成可继续生长的剧情场景。现在它已经具备场景舞台、章节信息、任务区、NPC 入口和系统分层说明。"
-    >
-      <section className="grid-single">
-        <Panel eyebrow="Demo Flow" title="演示流程入口">
-          <div className="demo-flow-card">
-            <div className="demo-flow-card__copy">
-              <p className="metric-card__label">Demo Status</p>
+    <div className="adventure-screen-page">
+      <section className={`adventure-stage-board ${chapterVisualState.sceneClassName}`}>
+        <img
+          className="forest-canvas__backdrop-image"
+          src={forestExplorationFirstPersonBackgroundImage}
+          alt="倒悬森林深处的主场景"
+        />
+        <img
+          className="forest-canvas__canopy-gate"
+          src={forestInvertedCanopyGateImage}
+          alt=""
+          aria-hidden="true"
+        />
+        <div className="forest-canvas__veil" />
+        <img
+          className="adventure-stage-board__tree-cluster"
+          src={currentRouteStage.treeAsset}
+          alt=""
+          aria-hidden="true"
+        />
+        <img
+          className="adventure-stage-board__road-layer"
+          src={currentRouteStage.roadAsset}
+          alt=""
+          aria-hidden="true"
+        />
+        <img
+          className="adventure-stage-board__rock-layer"
+          src={currentRouteStage.rockAsset}
+          alt=""
+          aria-hidden="true"
+        />
+        <img
+          className="forest-canvas__path-guide"
+          src={forestGeneratedSceneAssets.forestPathRibbon}
+          alt=""
+          aria-hidden="true"
+        />
+        <img
+          className="forest-canvas__waterfall-guide"
+          src={forestGeneratedSceneAssets.forestWaterfallColumn}
+          alt=""
+          aria-hidden="true"
+        />
+        <img
+          className="forest-canvas__star forest-canvas__star--left"
+          src={forestGeneratedSceneAssets.forestGlowStar}
+          alt=""
+          aria-hidden="true"
+        />
+        <img
+          className="forest-canvas__star forest-canvas__star--right"
+          src={forestGeneratedSceneAssets.forestGlowStar}
+          alt=""
+          aria-hidden="true"
+        />
+        {currentRouteStage.effectAsset ? (
+          <img
+            className="adventure-stage-board__effect-layer"
+            src={currentRouteStage.effectAsset}
+            alt=""
+            aria-hidden="true"
+          />
+        ) : null}
+
+        <div className="adventure-stage-board__top">
+          <div className="adventure-stage-chip-row">
+            <span className="adventure-stage-chip">阶段：{activeChapter.label}</span>
+            <span className="adventure-stage-chip">夜色：{activeChapter.season}</span>
+            <span className="adventure-stage-chip">状态：{activeChapterStatus}</span>
+          </div>
+
+          <div className="adventure-stage-progress">
+            <div className="journey-progress__track">
+              <div className="journey-progress__fill" style={{ width: progressPercent }} />
+            </div>
+            <span>{chapterVisualState.distanceLabel}</span>
+          </div>
+        </div>
+
+        <div className="adventure-stage-board__left-card">
+          <img
+            className="adventure-stage-board__npc-avatar"
+            src={activeChapter.npc.imageSrc}
+            alt={`${activeChapter.npc.name}的角色形象`}
+          />
+          <div>
+            <p className="metric-card__label">前方伙伴</p>
+            <h3>{activeChapter.npc.name}</h3>
+            <span>{chapterVisualState.encounterLabel}</span>
+          </div>
+        </div>
+
+        <div className="adventure-stage-board__right-card">
+          <p className="metric-card__label">当前路段</p>
+          <h2>{currentRouteStage.title}</h2>
+          <p>{currentRouteStage.hint}</p>
+          <span>{currentRouteStage.atmosphere}</span>
+        </div>
+
+        <div className="adventure-stage-board__route-strip">
+          {routeStages.map((stage, index) => {
+            const isCurrent = stage.id === currentRouteStage.id;
+            const isDone = index < completedEvents;
+
+            return (
+              <div
+                key={stage.id}
+                className={`adventure-route-node ${isCurrent ? 'is-current' : ''} ${isDone ? 'is-done' : ''}`}
+              >
+                <span className="adventure-route-node__dot" />
+                <strong>{stage.title}</strong>
+                <small>{stage.hint}</small>
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="adventure-stage-board__companion">
+          <img src={otterCharacterImage} alt={`${companionName}正在陪你前进`} />
+          <div>
+            <p className="metric-card__label">陪伴伙伴</p>
+            <h3>{companionName}</h3>
+            <span>{personalityText}</span>
+          </div>
+        </div>
+
+        <div className="adventure-stage-board__story">
+          <p className="metric-card__label">{currentDialogue.speaker}</p>
+          <h3>{currentDialogue.text}</h3>
+          <span>
+            {playerName} 和 {companionName} 正沿着会发光的道路继续往前走。
+          </span>
+        </div>
+
+        <div className="adventure-stage-board__actions">
+          <div className="adventure-stage-board__actions-head">
+            <div>
+              <p className="metric-card__label">现在行动</p>
               <h3>
-                {hasStarted
-                  ? isDemoComplete
-                    ? '冒险已完成，可继续查看回顾与结果'
-                    : '冒险进行中，可继续从当前进度演示'
-                  : '还没有开始演示，点击下方按钮进入冒险'}
+                已完成 {completedEvents}/{activeChapter.events.length} 个任务
               </h3>
-              <span>
-                当前累计星星 {String(totalReward.stars).padStart(4, '0')}，月光值{' '}
-                {totalReward.moonlight}%。
-              </span>
             </div>
-            <div className="button-row">
-              <button
-                type="button"
-                className="chapter-button chapter-button--primary"
-                onClick={startDemo}
-              >
-                {hasStarted ? '继续当前演示' : '开始冒险演示'}
-              </button>
-              <button type="button" className="chapter-button" onClick={resetDemo}>
-                重置本地进度
-              </button>
-              {isDemoComplete ? (
-                <GlowButton to="/story-retell" tone="gold">
-                  进入故事回顾
-                </GlowButton>
-              ) : null}
+            <div className="adventure-stage-board__reward">
+              <span>星星 {String(totalReward.stars).padStart(4, '0')}</span>
+              <span>月光 {totalReward.moonlight}%</span>
             </div>
           </div>
-        </Panel>
-      </section>
 
-      <section className="adventure-layout">
-        <div className="forest-canvas forest-canvas--first-person">
-          <img
-            className="forest-canvas__backdrop-image"
-            src={forestExplorationFirstPersonBackgroundImage}
-            alt="倒悬森林中的第一人称探索道路背景"
-          />
-          <div className="forest-canvas__veil" />
-          <img
-            className="forest-canvas__path-guide"
-            src={forestGeneratedSceneAssets.forestPathRibbon}
-            alt=""
-            aria-hidden="true"
-          />
-          <img
-            className="forest-canvas__waterfall-guide"
-            src={forestGeneratedSceneAssets.forestWaterfallColumn}
-            alt=""
-            aria-hidden="true"
-          />
-          <img
-            className="forest-canvas__star forest-canvas__star--left"
-            src={forestGeneratedSceneAssets.forestGlowStar}
-            alt=""
-            aria-hidden="true"
-          />
-          <img
-            className="forest-canvas__star forest-canvas__star--right"
-            src={forestGeneratedSceneAssets.forestGlowStar}
-            alt=""
-            aria-hidden="true"
-          />
-          <img
-            className="forest-canvas__crystal forest-canvas__crystal--left"
-            src={forestGeneratedSceneAssets.forestFloatingCrystal}
-            alt=""
-            aria-hidden="true"
-          />
-          <img
-            className="forest-canvas__crystal forest-canvas__crystal--right"
-            src={forestGeneratedSceneAssets.forestFloatingCrystal}
-            alt=""
-            aria-hidden="true"
-          />
-          <div className="forest-canvas__camera-note">
-            <p className="forest-canvas__objective-label">探索镜头</p>
-            <strong>第一人称沿道路推进</strong>
-            <span>水獭作为陪跑伙伴出现，主画面始终保持向前穿梭倒悬森林的视角。</span>
-          </div>
-          <div className="forest-canvas__companion">
-            <img
-              className="forest-canvas__companion-image"
-              src={otterCharacterImage}
-              alt="陪跑中的水獭角色"
-            />
-            <div className="forest-canvas__companion-copy">
-              <p className="metric-card__label">Companion</p>
-              <h3>陪跑水獭</h3>
-              <span>不站在路中央，而是在视角边缘陪你前进、提示和鼓励。</span>
-            </div>
-          </div>
-          <div className="forest-canvas__objective">
-            <p className="forest-canvas__objective-label">当前目标</p>
-            <h3>{activeChapter.objective}</h3>
-            <span>{activeChapter.sceneEvent}</span>
-          </div>
-          <div className="forest-canvas__hud">
-            <div className="hud-chip">季节：{activeChapter.season}</div>
-            <div className="hud-chip">章节：{activeChapter.label}</div>
-            <div className="hud-chip">状态：{activeChapterStatus}</div>
-          </div>
-          <div className="forest-canvas__stars">
-            <span>星星 {String(activeChapter.reward.stars).padStart(4, '0')}</span>
-            <span>月光值 {activeChapter.reward.moonlight}%</span>
-          </div>
-        </div>
+          <div className="adventure-stage-board__action-list">
+            {activeChapter.events.map((event) => {
+              const isTriggered = triggeredEventIds.has(event.id);
 
-        <div className="adventure-sidebar">
-          <Panel eyebrow="Story Runtime" title="主线推进节点">
-            <AdventureTimeline
-              chapters={chapters}
-              activeChapterId={activeChapter.id}
-              onSelectChapter={goToChapter}
-            />
-          </Panel>
-
-          <Panel eyebrow="Dialogue Layer" title="NPC 对话面板">
-            <AdventureDialoguePanel
-              npc={activeChapter.npc}
-              dialogue={activeChapter.dialogue}
-            />
-          </Panel>
-
-          <Panel eyebrow="Adventure Modes" title="页面承载的三种模式">
-            <div className="stack-list">
-              {forestAdventureModes.map((item) => (
-                <div
-                  key={item.title}
-                  className={`metric-card ${item.title === activeChapter.mode ? 'is-active' : ''}`}
+              return (
+                <button
+                  key={event.id}
+                  type="button"
+                  className={`adventure-action-button ${isTriggered ? 'is-done' : ''}`}
+                  onClick={() => dispatchStoryEvent(event)}
+                  disabled={isTriggered || activeChapter.isCompleted}
                 >
-                  <p className="metric-card__label">Mode</p>
-                  <h3>{item.title}</h3>
-                  <span>{item.description}</span>
-                </div>
-              ))}
-            </div>
-          </Panel>
+                  <strong>{event.title}</strong>
+                  <span>{event.description}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="adventure-stage-board__action-bar">
+            <button
+              type="button"
+              className="chapter-button chapter-button--primary"
+              onClick={startDemo}
+            >
+              {hasStarted ? '继续前进' : '开始冒险'}
+            </button>
+            <button
+              type="button"
+              className="chapter-button"
+              onClick={completeCurrentChapter}
+              disabled={!activeChapter.canComplete || activeChapter.isCompleted}
+            >
+              {activeChapter.isCompleted ? '这一站已经完成' : '完成这一站'}
+            </button>
+            <button type="button" className="chapter-button" onClick={resetDemo}>
+              重新开始
+            </button>
+            {isDemoComplete ? (
+              <GlowButton to="/story-retell" tone="gold">
+                去看今晚回忆
+              </GlowButton>
+            ) : null}
+          </div>
         </div>
       </section>
-
-      <section className="grid-two adventure-secondary">
-        <Panel eyebrow="Chapter Control" title="章节节点流控制台">
-          <AdventureStatePanel
-            chapter={activeChapter}
-            triggeredEventIds={triggeredEventIds}
-            onDispatchEvent={dispatchStoryEvent}
-            onCompleteChapter={completeCurrentChapter}
-          />
-        </Panel>
-
-        <Panel eyebrow="Scene Layers" title="冒险页分层">
-          <div className="layer-list">
-            {forestLayers.map((item) => (
-              <div key={item} className="layer-item">
-                <span className="layer-item__bar" />
-                <p>{item}</p>
-              </div>
-            ))}
-          </div>
-        </Panel>
-
-        <Panel eyebrow="NPC Entry" title="森林角色关系">
-          <div className="npc-grid">
-            {forestNpcProfiles.map((item) => (
-              <article
-                key={item.name}
-                className={`npc-card ${item.name === activeChapter.npc.name ? 'npc-card--active' : ''}`}
-              >
-                <p className="metric-card__label">{item.role}</p>
-                <h3>{item.name}</h3>
-                <span>{item.description}</span>
-              </article>
-            ))}
-          </div>
-        </Panel>
-      </section>
-
-      <section className="grid-two adventure-secondary">
-        <Panel eyebrow="View Grammar" title="探索模式镜头语法">
-          <div className="layer-list">
-            {forestExplorationViewpoints.map((item) => (
-              <div key={item} className="layer-item">
-                <span className="layer-item__bar" />
-                <p>{item}</p>
-              </div>
-            ))}
-          </div>
-        </Panel>
-
-        <Panel eyebrow="Scene Assets" title="本轮生成素材">
-          <div className="stack-list">
-            {forestSceneAssetCards.map((item) => (
-              <article key={item.name} className="metric-card">
-                <p className="metric-card__label">{item.type}</p>
-                <h3>{item.name}</h3>
-                <span>{item.description}</span>
-              </article>
-            ))}
-          </div>
-        </Panel>
-      </section>
-
-      <section className="grid-single">
-        <Panel eyebrow="Next Hooks" title="后续接入点">
-          <div className="hook-grid">
-            <div className="metric-card">
-              <p className="metric-card__label">Quest State</p>
-              <h3>剧情状态机入口</h3>
-              <span>
-                已解锁 {unlockedChapterCount} / {chapters.length} 章，已完成{' '}
-                {completedChapterCount} 章。
-              </span>
-            </div>
-            <div className="metric-card">
-              <p className="metric-card__label">Dialogue Layer</p>
-              <h3>对话与旁白容器</h3>
-              <span>当前已经用本地章节数据驱动旁白、水獭和 NPC 的演示对话。</span>
-            </div>
-            <div className="metric-card">
-              <p className="metric-card__label">Scene Events</p>
-              <h3>场景事件占位</h3>
-              <span>{activeChapter.sceneEvent}</span>
-            </div>
-            <div className="metric-card">
-              <p className="metric-card__label">Unlock Flags</p>
-              <h3>统一状态入口</h3>
-              <span>
-                {completedFlags.size > 0
-                  ? Array.from(completedFlags).join(' / ')
-                  : '当前还没有完成标记，适合从第一章开始演示。'}
-              </span>
-            </div>
-            <div className="metric-card">
-              <p className="metric-card__label">Demo Closure</p>
-              <h3>演示闭环出口</h3>
-              <span>
-                {isDemoComplete
-                  ? '已解锁故事回顾、结果页和分享页，可完整演示闭环。'
-                  : '完成全部章节后，会自动进入“回顾 -> 结果 -> 分享”的演示闭环。'}
-              </span>
-            </div>
-          </div>
-        </Panel>
-      </section>
-    </SceneShell>
+    </div>
   );
 }

@@ -120,21 +120,19 @@ export function useAdventureDemoStory() {
 
   const dispatcher = useMemo(
     () =>
-      createStoryEventDispatcher<ForestStoryNodeDefinition, ForestStoryEventCatalogItem>(
-        {
-          eventCatalog: forestStoryEventCatalog,
-          getActiveNode: () => getStoryNodeById(forestStoryDefinitions, activeChapterId),
-          getCompletedFlags: () => completedFlags,
-          getTriggeredEventIds: () => triggeredEventIds,
-          onDispatchAccepted: (event) => {
-            setTriggeredEventIds((currentIds) => {
-              const nextIds = new Set(currentIds);
-              nextIds.add(event.eventId);
-              return nextIds;
-            });
-          },
+      createStoryEventDispatcher<ForestStoryNodeDefinition, ForestStoryEventCatalogItem>({
+        eventCatalog: forestStoryEventCatalog,
+        getActiveNode: () => getStoryNodeById(forestStoryDefinitions, activeChapterId),
+        getCompletedFlags: () => completedFlags,
+        getTriggeredEventIds: () => triggeredEventIds,
+        onDispatchAccepted: (event) => {
+          setTriggeredEventIds((currentIds) => {
+            const nextIds = new Set(currentIds);
+            nextIds.add(event.eventId);
+            return nextIds;
+          });
         },
-      ),
+      }),
     [activeChapterId, completedFlags, triggeredEventIds],
   );
 
@@ -159,7 +157,7 @@ export function useAdventureDemoStory() {
     if (event.source === 'voice') {
       if (event.id === 'voice-describe-forest') {
         return bridge.emitVoiceSignal(
-          createVoiceSignal('describe_forest', '我看见会发光的道路和月瀑。'),
+          createVoiceSignal('describe_forest', '我看见了会发光的道路、月瀑和倒悬的树。'),
         );
       }
 

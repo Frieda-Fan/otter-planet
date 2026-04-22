@@ -24,15 +24,15 @@ export function AdventureTimeline({
           <span className="timeline-item__dot" />
           <div className="timeline-item__content">
             <strong>
-              {chapter.label} · {chapter.title}
+              {chapter.label} 路 {chapter.title}
             </strong>
             <p>{chapter.summary}</p>
             <span className="timeline-item__status">
               {chapter.isCompleted
-                ? '已完成'
+                ? '这一站已经完成'
                 : chapter.isUnlocked
-                  ? `事件进度 ${chapter.completedEventCount}/${chapter.totalEventCount}`
-                  : '尚未解锁'}
+                  ? `已完成 ${chapter.completedEventCount}/${chapter.totalEventCount} 个任务`
+                  : '还没走到这里'}
             </span>
           </div>
         </button>

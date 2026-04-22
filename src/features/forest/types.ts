@@ -8,6 +8,7 @@ export type ForestNpcProfile = {
   role: string;
   description: string;
   mood: string;
+  imageSrc: string;
 };
 
 export type ForestDialogueTurn = {
@@ -80,6 +81,17 @@ export type ForestStoryPresentation = {
 export type ForestStoryDispatchEvent = {
   eventId: ForestStoryEventId;
   source: ForestStoryEventSource;
+};
+
+export type ForestRouteSceneStage = {
+  id: string;
+  title: string;
+  hint: string;
+  atmosphere: string;
+  treeAsset: string;
+  roadAsset: string;
+  rockAsset: string;
+  effectAsset?: string;
 };
 
 export type ForestResolvedStoryNode = ForestStoryNodeDefinition &

@@ -9,22 +9,24 @@ type AdventureStatePanelProps = {
   triggeredEventIds: Set<ForestStoryEventId>;
   onDispatchEvent: (event: ForestStoryEventCatalogItem) => void;
   onCompleteChapter: () => void;
+  companionName: string;
 };
 
-function getSimulatorLabel(source: ForestStoryEventCatalogItem['source']) {
-  if (source === 'voice') {
-    return '模拟语音识别';
-  }
+function getActionLabel(event: ForestStoryEventCatalogItem) {
+  const actionMap: Record<ForestStoryEventCatalogItem['id'], string> = {
+    'scene-light-path': '看看前方',
+    'story-meet-shanshan': '听它说话',
+    'gesture-point-forward': '继续向前',
+    'voice-describe-forest': '说说看到什么',
+    'scene-crystal-response': '靠近晶体',
+    'story-review-clues': '回想线索',
+    'gesture-lift-wand': '举起魔法棒',
+    'scene-fake-moon-break': '走近月亮',
+    'voice-describe-true-moon': '说出心里的月亮',
+    'story-final-blessing': '收下祝福',
+  };
 
-  if (source === 'scene') {
-    return '模拟场景反馈';
-  }
-
-  if (source === 'gesture') {
-    return '模拟手势命中';
-  }
-
-  return '模拟剧情触发';
+  return actionMap[event.id];
 }
 
 export function AdventureStatePanel({
@@ -32,21 +34,20 @@ export function AdventureStatePanel({
   triggeredEventIds,
   onDispatchEvent,
   onCompleteChapter,
+  companionName,
 }: AdventureStatePanelProps) {
   return (
     <div className="story-state-card">
-      <p className="story-state-card__kicker">Current Chapter</p>
+      <p className="story-state-card__kicker">现在可以这样做</p>
       <h3>
-        {chapter.label} · {chapter.title}
+        {chapter.label} 路 {chapter.title}
       </h3>
-      <p>{chapter.summary}</p>
+      <p>{chapter.objective}</p>
       <div className="story-state-card__meta">
+        <span>完成这一站后，会获得：{chapter.reward.badge}</span>
         <span>
-          进入条件：
-          {chapter.entryFlags.length > 0 ? chapter.entryFlags.join(' / ') : '起始章节，无前置条件'}
+          只要把下面的任务都点亮，{companionName} 就会陪你走向下一段新的路。
         </span>
-        <span>完成条件：通过下方模拟输入面板完成本章所需的系统信号后，点亮“完成当前章节”</span>
-        <span>奖励变化：{chapter.reward.badge}</span>
       </div>
 
       <div className="story-event-list">
@@ -69,7 +70,7 @@ export function AdventureStatePanel({
                 onClick={() => onDispatchEvent(event)}
                 disabled={isTriggered || chapter.isCompleted}
               >
-                {isTriggered ? '已接收' : getSimulatorLabel(event.source)}
+                {isTriggered ? '已经完成' : getActionLabel(event)}
               </button>
             </article>
           );
@@ -83,7 +84,7 @@ export function AdventureStatePanel({
           onClick={onCompleteChapter}
           disabled={!chapter.canComplete || chapter.isCompleted}
         >
-          {chapter.isCompleted ? '本章已完成' : '完成当前章节'}
+          {chapter.isCompleted ? '这一站已经完成' : '完成这一站旅程'}
         </button>
       </div>
     </div>

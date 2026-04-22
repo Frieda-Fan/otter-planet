@@ -1,0 +1,17 @@
+<svg width="320" height="320" viewBox="0 0 320 320" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="320" height="320" rx="48" fill="url(#bg)"/>
+  <path d="M160 58C200.869 58 234 91.1309 234 132C234 166.162 210.31 194.792 178.462 202.373L160 250L141.538 202.373C109.69 194.792 86 166.162 86 132C86 91.1309 119.131 58 160 58Z" fill="#FFF0E7"/>
+  <circle cx="136" cy="126" r="9" fill="#5C4C63"/>
+  <circle cx="184" cy="126" r="9" fill="#5C4C63"/>
+  <path d="M140 150C151 158.667 169 158.667 180 150" stroke="#5C4C63" stroke-width="8" stroke-linecap="round"/>
+  <path d="M108 96C120 82 136 74 160 74C184 74 202 82 214 96" stroke="#FFB7CB" stroke-width="10" stroke-linecap="round"/>
+  <circle cx="90" cy="220" r="16" fill="#FFE7A1"/>
+  <circle cx="230" cy="88" r="12" fill="#E8F8FF"/>
+  <text x="160" y="285" text-anchor="middle" fill="#FFF9E2" font-size="24" font-family="Microsoft YaHei UI, sans-serif">小贝壳</text>
+  <defs>
+    <linearGradient id="bg" x1="36" y1="24" x2="286" y2="294" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FF9EC9"/>
+      <stop offset="1" stop-color="#6B7CFF"/>
+    </linearGradient>
+  </defs>
+</svg>
