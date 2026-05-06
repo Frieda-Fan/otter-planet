@@ -9,7 +9,8 @@ type OnboardingState =
   | 'waiting_name_wave'
   | 'name_dialog_open'
   | 'waiting_personality_wave'
-  | 'personality_panel_open';
+  | 'personality_panel_open'
+  | 'waiting_adventure_wave';
 
 type Zone = 'left' | 'center' | 'right';
 
@@ -17,10 +18,11 @@ type GestureOnboardingProps = {
   otterImage: string;
 };
 
-const WAVE_WINDOW_MS = 3000;
+const WAVE_WINDOW_MS = 5000;
 const COOLDOWN_MS = 1500;
 const CENTER_LEFT = 0.4;
 const CENTER_RIGHT = 0.6;
+const INPUT_READY_DELAY_MS = 2000;
 
 function getHandCenterX(landmarks: { x: number }[]) {
   const points = [landmarks[0], landmarks[5], landmarks[9], landmarks[13]];
@@ -49,6 +51,9 @@ export function GestureOnboarding({ otterImage }: GestureOnboardingProps) {
   const zoneHistoryRef = useRef<Zone[]>([]);
   const cycleTimesRef = useRef<number[]>([]);
   const lastZoneRef = useRef<Zone>('center');
+  const traitSelectedAtRef = useRef(0);
+  const stateRef = useRef<OnboardingState>('waiting_name_wave');
+  const completeAdoptionRef = useRef<() => void>(() => {});
 
   const [showTitle, setShowTitle] = useState(false);
   const [hideTitle, setHideTitle] = useState(false);
@@ -64,6 +69,7 @@ export function GestureOnboarding({ otterImage }: GestureOnboardingProps) {
   const [selectedTag, setSelectedTag] = useState<OtterPersonalityTag | null>(
     session.personalityTags[0] ?? null,
   );
+  const [traitSelectionVersion, setTraitSelectionVersion] = useState(0);
 
   const canConfirmName = otterName.trim().length > 0;
   const canConfirmTrait = Boolean(selectedTag);
@@ -75,22 +81,47 @@ export function GestureOnboarding({ otterImage }: GestureOnboardingProps) {
     setWaveCount(0);
   }, []);
 
+  const completeAdoption = useCallback(() => {
+    if (!selectedTag || !canConfirmName) {
+      return;
+    }
+
+    patchSession({
+      otterName: otterName.trim(),
+      personalityTags: [selectedTag],
+      hasAdopted: true,
+    });
+    navigate('/adventure');
+  }, [canConfirmName, navigate, otterName, patchSession, selectedTag]);
+
+  useEffect(() => {
+    stateRef.current = state;
+  }, [state]);
+
+  useEffect(() => {
+    completeAdoptionRef.current = completeAdoption;
+  }, [completeAdoption]);
+
   const triggerWaveAction = useCallback(() => {
+    const currentState = stateRef.current;
+
     cooldownUntilRef.current = Date.now() + COOLDOWN_MS;
     setLastTriggerTime(new Date().toLocaleTimeString());
     resetWaveTracking();
 
-    setState((currentState) => {
-      if (currentState === 'waiting_name_wave') {
-        return 'name_dialog_open';
-      }
+    if (currentState === 'waiting_name_wave') {
+      setState('name_dialog_open');
+      return;
+    }
 
-      if (currentState === 'waiting_personality_wave') {
-        return 'personality_panel_open';
-      }
+    if (currentState === 'waiting_personality_wave') {
+      setState('personality_panel_open');
+      return;
+    }
 
-      return currentState;
-    });
+    if (currentState === 'waiting_adventure_wave') {
+      completeAdoptionRef.current();
+    }
   }, [resetWaveTracking]);
 
   const handleResults = useCallback((results: Results) => {
@@ -109,8 +140,8 @@ export function GestureOnboarding({ otterImage }: GestureOnboardingProps) {
 
     if (
       now < cooldownUntilRef.current ||
-      state === 'name_dialog_open' ||
-      state === 'personality_panel_open'
+      stateRef.current === 'name_dialog_open' ||
+      stateRef.current === 'personality_panel_open'
     ) {
       lastZoneRef.current = zone;
       return;
@@ -147,7 +178,7 @@ export function GestureOnboarding({ otterImage }: GestureOnboardingProps) {
     if (zone === 'center') {
       lastZoneRef.current = 'center';
     }
-  }, [state, triggerWaveAction]);
+  }, [triggerWaveAction]);
 
   useEffect(() => {
     const titleTimer = window.setTimeout(() => setShowTitle(true), 1000);
@@ -239,6 +270,38 @@ export function GestureOnboarding({ otterImage }: GestureOnboardingProps) {
     };
   }, [gestureEnabled, handleResults, resetWaveTracking]);
 
+  useEffect(() => {
+    if (!gestureEnabled || state !== 'name_dialog_open' || !canConfirmName) {
+      return;
+    }
+
+    const inputReadyTimer = window.setTimeout(() => {
+      setState('waiting_personality_wave');
+      resetWaveTracking();
+    }, INPUT_READY_DELAY_MS);
+
+    return () => window.clearTimeout(inputReadyTimer);
+  }, [canConfirmName, gestureEnabled, otterName, resetWaveTracking, state]);
+
+  useEffect(() => {
+    if (
+      !gestureEnabled ||
+      state !== 'personality_panel_open' ||
+      !selectedTag ||
+      traitSelectionVersion === 0 ||
+      traitSelectedAtRef.current === 0
+    ) {
+      return;
+    }
+
+    const traitReadyTimer = window.setTimeout(() => {
+      setState('waiting_adventure_wave');
+      resetWaveTracking();
+    }, INPUT_READY_DELAY_MS);
+
+    return () => window.clearTimeout(traitReadyTimer);
+  }, [gestureEnabled, resetWaveTracking, selectedTag, state, traitSelectionVersion]);
+
   const handleOtterClick = useCallback(() => {
     if (state === 'waiting_name_wave' && isOtterVisible) {
       setState('name_dialog_open');
@@ -252,20 +315,11 @@ export function GestureOnboarding({ otterImage }: GestureOnboardingProps) {
 
     setState('personality_panel_open');
     resetWaveTracking();
-  }, [canConfirmName, gestureEnabled, resetWaveTracking]);
+  }, [canConfirmName, resetWaveTracking]);
 
   const handleConfirmTrait = useCallback(() => {
-    if (!selectedTag || !canConfirmName) {
-      return;
-    }
-
-    patchSession({
-      otterName: otterName.trim(),
-      personalityTags: [selectedTag],
-      hasAdopted: true,
-    });
-    navigate('/adventure');
-  }, [canConfirmName, navigate, otterName, patchSession, selectedTag]);
+    completeAdoption();
+  }, [completeAdoption]);
 
   const debugHandX = useMemo(
     () => (handX === null ? '无' : handX.toFixed(3)),
@@ -308,7 +362,7 @@ export function GestureOnboarding({ otterImage }: GestureOnboardingProps) {
         </div>
       </section>
 
-      {state === 'name_dialog_open' ? (
+      {state === 'name_dialog_open' || state === 'waiting_personality_wave' ? (
         <section className="starry-dialog-shell">
           <article className="starry-dialog-card">
             <p className="metric-card__label">Step 1</p>
@@ -334,7 +388,7 @@ export function GestureOnboarding({ otterImage }: GestureOnboardingProps) {
         </section>
       ) : null}
 
-      {state === 'personality_panel_open' ? (
+      {state === 'personality_panel_open' || state === 'waiting_adventure_wave' ? (
         <section className="starry-dialog-shell">
           <article className="starry-dialog-card">
             <p className="metric-card__label">Step 2</p>
@@ -348,7 +402,11 @@ export function GestureOnboarding({ otterImage }: GestureOnboardingProps) {
                     key={item.tag}
                     type="button"
                     className={`trait-chip ${isSelected ? 'is-selected' : ''}`}
-                    onClick={() => setSelectedTag(item.tag)}
+                    onClick={() => {
+                      traitSelectedAtRef.current = Date.now();
+                      setTraitSelectionVersion((version) => version + 1);
+                      setSelectedTag(item.tag);
+                    }}
                   >
                     <strong>{item.tag}</strong>
                     <span>{item.description}</span>
