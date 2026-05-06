@@ -93,16 +93,20 @@ export async function createHandGestureDetector() {
   function detectMagicWake(center: CenterPoint) {
     const recent = trimHistory(centerHistory, 1000);
 
-    if (recent.length < 5) {
+    if (recent.length < 6) {
       return null;
     }
 
     let changeCount = 0;
     let lastDirection = 0;
+    const xs = recent.map((point) => point.x);
+    const centerX = xs.reduce((sum, value) => sum + value, 0) / xs.length;
+    const maxOffset = Math.max(...xs.map((value) => Math.abs(value - centerX)));
+    const totalRange = Math.max(...xs) - Math.min(...xs);
 
     for (let index = 1; index < recent.length; index += 1) {
       const deltaX = recent[index].x - recent[index - 1].x;
-      const direction = Math.abs(deltaX) > 0.02 ? Math.sign(deltaX) : 0;
+      const direction = Math.abs(deltaX) > 0.03 ? Math.sign(deltaX) : 0;
 
       if (direction !== 0 && lastDirection !== 0 && direction !== lastDirection) {
         changeCount += 1;
@@ -113,7 +117,7 @@ export async function createHandGestureDetector() {
       }
     }
 
-    if (changeCount >= 2 && canTrigger('magic_wake')) {
+    if (changeCount >= 2 && maxOffset > 0.05 && totalRange > 0.1 && canTrigger('magic_wake')) {
       markTriggered('magic_wake');
       return result(
         'magic_wake',

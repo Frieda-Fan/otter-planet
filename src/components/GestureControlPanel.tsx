@@ -1,18 +1,32 @@
+import { useEffect } from 'react';
 import { useGestureContext } from '../gesture/GestureProvider';
 
 export function GestureControlPanel() {
   const {
+    attachVideoRef,
     currentGesture,
     isActive,
+    restartGestureSystem,
     startGestureSystem,
     stopGestureSystem,
-    videoRef,
   } = useGestureContext();
+
+  useEffect(() => {
+    void startGestureSystem();
+
+    const retryTimer = window.setTimeout(() => {
+      void startGestureSystem();
+    }, 800);
+
+    return () => {
+      window.clearTimeout(retryTimer);
+    };
+  }, [startGestureSystem]);
 
   return (
     <aside className="gesture-debug-panel">
       <div className="gesture-debug-panel__video-wrap">
-        <video ref={videoRef} className="gesture-debug-panel__video" />
+        <video ref={attachVideoRef} className="gesture-debug-panel__video" />
       </div>
 
       <div className="gesture-debug-panel__copy">
@@ -50,7 +64,7 @@ export function GestureControlPanel() {
           type="button"
           className="gesture-panel-button gesture-panel-button--primary"
           onClick={() => {
-            void startGestureSystem();
+            void restartGestureSystem();
           }}
         >
           开启手势识别

@@ -6,7 +6,8 @@ import { AppRoutes } from '../routes';
 function AppBody() {
   const location = useLocation();
   const showGesturePanel =
-    location.pathname === '/adopt' || location.pathname === '/adventure';
+    location.pathname === '/adopt' ||
+    location.pathname === '/adventure';
 
   return (
     <>

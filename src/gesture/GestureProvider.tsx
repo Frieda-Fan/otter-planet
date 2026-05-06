@@ -6,8 +6,8 @@ import {
   useMemo,
   useRef,
   useState,
+  type MutableRefObject,
   type PropsWithChildren,
-  type RefObject,
 } from 'react';
 import { startCamera } from './camera';
 import { createHandGestureDetector } from './gestureDetector';
@@ -16,8 +16,10 @@ import type { GestureResult } from './gestureTypes';
 type GestureContextValue = {
   currentGesture: GestureResult;
   isActive: boolean;
-  videoRef: RefObject<HTMLVideoElement>;
+  videoRef: MutableRefObject<HTMLVideoElement | null>;
+  attachVideoRef: (node: HTMLVideoElement | null) => void;
   startGestureSystem: () => Promise<void>;
+  restartGestureSystem: () => Promise<void>;
   stopGestureSystem: () => void;
 };
 
@@ -30,11 +32,13 @@ const idleGesture: GestureResult = {
 };
 
 export function GestureProvider({ children }: PropsWithChildren) {
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
   const detectorRef = useRef<Awaited<ReturnType<typeof createHandGestureDetector>> | null>(null);
   const stopCameraRef = useRef<(() => void) | null>(null);
   const frameRef = useRef<number | null>(null);
   const isRunningRef = useRef(false);
+  const isActiveRef = useRef(false);
+  const pendingAutoStartRef = useRef(false);
 
   const [currentGesture, setCurrentGesture] = useState<GestureResult>(idleGesture);
   const [isActive, setIsActive] = useState(false);
@@ -58,15 +62,22 @@ export function GestureProvider({ children }: PropsWithChildren) {
     }
 
     setIsActive(false);
+    isActiveRef.current = false;
     setCurrentGesture(idleGesture);
   }, []);
 
   const startGestureSystem = useCallback(async () => {
-    if (isRunningRef.current || !videoRef.current) {
+    if (!videoRef.current) {
+      pendingAutoStartRef.current = true;
+      return;
+    }
+
+    if (isRunningRef.current) {
       return;
     }
 
     const videoElement = videoRef.current;
+    pendingAutoStartRef.current = false;
     isRunningRef.current = true;
 
     try {
@@ -81,9 +92,10 @@ export function GestureProvider({ children }: PropsWithChildren) {
         const nextGesture = detectorRef.current.detect(videoRef.current);
 
         if (nextGesture.name === 'magic_wake') {
+          isActiveRef.current = true;
           setIsActive(true);
           setCurrentGesture(nextGesture);
-        } else if (isActive || nextGesture.name === 'idle') {
+        } else if (isActiveRef.current || nextGesture.name === 'idle') {
           setCurrentGesture(nextGesture);
         } else {
           setCurrentGesture({
@@ -106,7 +118,26 @@ export function GestureProvider({ children }: PropsWithChildren) {
         debug: error instanceof Error ? error.message : '手势系统启动失败',
       });
     }
-  }, [isActive, stopGestureSystem]);
+  }, [stopGestureSystem]);
+
+  const restartGestureSystem = useCallback(async () => {
+    stopGestureSystem();
+    pendingAutoStartRef.current = true;
+
+    await new Promise((resolve) => {
+      window.setTimeout(resolve, 80);
+    });
+
+    await startGestureSystem();
+  }, [startGestureSystem, stopGestureSystem]);
+
+  const attachVideoRef = useCallback((node: HTMLVideoElement | null) => {
+    videoRef.current = node;
+
+    if (node && pendingAutoStartRef.current) {
+      void startGestureSystem();
+    }
+  }, [startGestureSystem]);
 
   useEffect(() => {
     return () => {
@@ -119,10 +150,12 @@ export function GestureProvider({ children }: PropsWithChildren) {
       currentGesture,
       isActive,
       videoRef,
+      attachVideoRef,
       startGestureSystem,
+      restartGestureSystem,
       stopGestureSystem,
     }),
-    [currentGesture, isActive, startGestureSystem, stopGestureSystem],
+    [attachVideoRef, currentGesture, isActive, restartGestureSystem, startGestureSystem, stopGestureSystem],
   );
 
   return <GestureContext.Provider value={value}>{children}</GestureContext.Provider>;
