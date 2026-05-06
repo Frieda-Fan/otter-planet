@@ -1866,6 +1866,14 @@ select {
   background: linear-gradient(180deg, rgba(255, 217, 142, 0.16), rgba(255, 178, 213, 0.1));
 }
 
+.trait-chip.is-gesture-focus,
+.adventure-action-button.is-gesture-focus,
+.chapter-button.is-gesture-focus {
+  outline: 2px solid rgba(134, 200, 255, 0.8);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 6px rgba(134, 200, 255, 0.12);
+}
+
 .trait-chip strong {
   font-size: 1rem;
 }
@@ -1889,6 +1897,112 @@ select {
 .inline-note {
   color: var(--gold);
   line-height: 1.7;
+}
+
+.gesture-helper-card {
+  display: grid;
+  gap: 8px;
+}
+
+.gesture-helper-card h3 {
+  margin: 6px 0 0;
+}
+
+.gesture-panel-button {
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-main);
+  border-radius: 999px;
+  padding: 12px 18px;
+  cursor: pointer;
+}
+
+.gesture-panel-button--primary {
+  background: linear-gradient(135deg, rgba(255, 217, 142, 0.96), rgba(255, 178, 213, 0.92));
+  color: #2b1d12;
+}
+
+.gesture-debug-panel {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  z-index: 10;
+  width: min(340px, calc(100vw - 24px));
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+  border-radius: 26px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(12, 16, 35, 0.86);
+  backdrop-filter: blur(18px);
+  box-shadow: 0 24px 58px rgba(5, 8, 18, 0.36);
+}
+
+.gesture-debug-panel__video-wrap {
+  overflow: hidden;
+  border-radius: 22px;
+  aspect-ratio: 4 / 3;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.gesture-debug-panel__video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scaleX(-1);
+}
+
+.gesture-debug-panel__eyebrow {
+  margin: 0;
+  font-size: 0.74rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(247, 243, 236, 0.7);
+}
+
+.gesture-debug-panel__copy h3 {
+  margin: 8px 0 12px;
+  font-size: 1.12rem;
+}
+
+.gesture-debug-panel__stats {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+}
+
+.gesture-debug-panel__stats div {
+  display: grid;
+  gap: 4px;
+}
+
+.gesture-debug-panel__stats dt {
+  color: rgba(247, 243, 236, 0.68);
+}
+
+.gesture-debug-panel__stats dd {
+  margin: 0;
+  font-weight: 700;
+}
+
+.gesture-debug-panel__note {
+  margin: 12px 0 0;
+  color: var(--text-soft);
+  line-height: 1.65;
+}
+
+.gesture-debug-panel__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+@media (max-width: 900px) {
+  .gesture-debug-panel {
+    position: static;
+    width: 100%;
+    margin-top: 16px;
+  }
 }
 
 @media (max-width: 1080px) {
